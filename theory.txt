@@ -1,0 +1,80 @@
+SySnappy is a tool to manufacture a "file system snapshot".
+
+-> Creates a file (XML) containing all current files within the file system tree.
+-> Has the ability to Check for differences between two snapshots. This provides the user with a concise summary of changed
+	files.
+
+
+XML-Architecture:
+-> Tags
+	-> Meta
+		-> Date
+	-> Directory
+		-> Date created
+		-> Date modified
+		-> Name
+		-> Owner
+		-> (Size)
+	-> File
+		-> Date created
+		-> Date modified
+		-> Name
+		-> Owner
+		-> Size
+		-> Type
+			- Regular File
+			- Directory
+			- Symbolic Link
+			- Named Pipe
+			- Socket
+			- Character/Block Device
+			- (Door)
+
+-> Example:
+	<meta>
+		<date>	16.04.2016 18:15:29	</date>
+	</meta>
+	<system>
+		<directory>
+			<name>			lindebear			</name>
+			<path>			/Users				</path>
+			<created>		09.08.2012 16:47	</created>
+			<modified>		16.04.2016 16:46	</modified>
+			<permissions>	755					</permissions>
+			<owner>			lindebear			</owner>
+			<group>			staff				</group>
+			<size>			31261066189			</size>
+			<type>			directory			</type>
+			<content>
+				<directory>
+					<name>			Applications		</name>
+					<path>			/Users/lindebear	</path>
+					<created>		13.03.2013 18:27	</created>
+					<modified>		07.01.2016 02:44	</modified>
+					<permissions>	755					</permissions>
+					<owner>			lindebear			</owner>
+					<group>			staff				</group>
+					<size>			6390				</size>
+					<type>			directory			</type>
+					<content>
+						...
+					</content>
+				</directory>
+				<directory>
+					<name>			Development			</name>
+					<path>			/Users/lindebear	</path>
+					<created>		10.08.2012 19:49	</created>
+					<modified>		10.03.2016 11:55	</modified>
+					<permissions>	755					</permissions>
+					<owner>			lindebear			</owner>
+					<group>			staff				</group>
+					<size>			418014516			</size>
+					<type>			directory			</type>
+					<content>
+						...
+					</content>
+				</directory>
+				...
+			</content>
+		</directory>
+	</system>
