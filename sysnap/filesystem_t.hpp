@@ -8,7 +8,7 @@
 namespace sysnap {
 	class FileSystem_t {
 	private:
-		FileSystemEntry_t system_m;
+		FileSystemEntry_t *system_m;
 
 	public:
 		FileSystem_t();
@@ -17,6 +17,10 @@ namespace sysnap {
 		void Scan(Path_t _path);
 		void Print();
 		void ExportAsXML();
+
+	public:
+		void _Insert_(FileSystemEntry_t& _entry);
+		void _Print_(FileSystemEntry_t _entry);
 	};
 }
 

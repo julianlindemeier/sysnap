@@ -1,4 +1,4 @@
-#include <string>
+#include <iostream>
 #include "path_t.hpp"
 
 namespace sysnap {
@@ -18,15 +18,35 @@ namespace sysnap {
 		this->path_m = this->_DecomposePath_(_path);
 	}
 
-	std::string Path_t::operator[](int _index) {
+	int Path_t::Levels() {
+		if(this->path_m.empty())
+			return 0;
+
+		return this->path_m.size();
+	}
+
+	void Path_t::operator=(std::string _path) {
+		this->path_m = this->_DecomposePath_(_path);
+	}
+
+	bool Path_t::operator==(const Path_t& _path) {
+		return (this->path_m == _path.path_m);
+	}
+
+	std::string Path_t::operator[](const int _index) {
 		return this->path_m[_index];
 	}
 
-	int Path_t::Levels() {
-		if(this->path_m.empty())
-			return -1;
+	std::ostream& operator<<(std::ostream &_out, Path_t _path) {
+		_out << "/";
 
-		return this->path_m.size();
+		for(std::vector<std::string>::iterator iter = _path.path_m.begin();
+		iter != _path.path_m.end();
+		iter++) {
+			_out << *iter << "/";
+		}
+		
+		return _out;
 	}
 
 	std::vector<std::string> Path_t::_DecomposePath_(std::string _path) {
@@ -44,6 +64,9 @@ namespace sysnap {
 		size_t pos = 0;
 		std::string token;
 		while ((pos = _path.find('/')) != std::string::npos) {
+			if(pos == 0) {
+				break;
+			}
 			token = _path.substr(0, pos);
 			ret_path_decomposed.push_back(token);
 			_path.erase(0, pos + 1);

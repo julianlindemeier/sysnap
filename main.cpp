@@ -14,6 +14,7 @@
 
 //#define DEBUG
 
+
 int main(int argc, char const *argv[]) {
 	std::string path;
 	std::vector<std::string> args;
@@ -65,8 +66,10 @@ int main(int argc, char const *argv[]) {
 	sysnap::FileSystemEntry_t dir_documents;
 	sysnap::FileSystemEntry_t file_myDoc_txt;
 
+	sysnap::FileSystem_t mySystem;
+
 	dir_lindebear.Name("lindebear");
-	dir_lindebear.Path("/User");
+	dir_lindebear.Path("/");
 	dir_lindebear.DateCreated(date_created);
 	dir_lindebear.DateModified();
 	dir_lindebear.Permissions(755);
@@ -75,8 +78,10 @@ int main(int argc, char const *argv[]) {
 	dir_lindebear.Size(12394871974);
 	dir_lindebear.FileType(sysnap::DIRECTORY);
 
+	mySystem._Insert_(dir_lindebear);
+
 	dir_applications.Name("Applications");
-	dir_applications.Path("/User/lindebear");
+	dir_applications.Path("/lindebear");
 	dir_applications.DateCreated(date_created);
 	dir_applications.DateModified();
 	dir_applications.Permissions(755);
@@ -85,8 +90,10 @@ int main(int argc, char const *argv[]) {
 	dir_applications.Size(31123);
 	dir_applications.FileType(sysnap::DIRECTORY);
 
+	mySystem._Insert_(dir_applications);
+
 	dir_desktop.Name("Desktop");
-	dir_desktop.Path("/User/lindebear");
+	dir_desktop.Path("/lindebear");
 	dir_desktop.DateCreated(date_created);
 	dir_desktop.DateModified();
 	dir_desktop.Permissions(755);
@@ -95,8 +102,10 @@ int main(int argc, char const *argv[]) {
 	dir_desktop.Size(35134);
 	dir_desktop.FileType(sysnap::DIRECTORY);
 
+	mySystem._Insert_(dir_desktop);
+
 	dir_documents.Name("Documents");
-	dir_documents.Path("/User/lindebear");
+	dir_documents.Path("/lindebear");
 	dir_documents.DateCreated(date_created);
 	dir_documents.DateModified();
 	dir_documents.Permissions(755);
@@ -105,8 +114,10 @@ int main(int argc, char const *argv[]) {
 	dir_documents.Size(4789475);
 	dir_documents.FileType(sysnap::DIRECTORY);
 
+	mySystem._Insert_(dir_documents);
+
 	file_myDoc_txt.Name("myDoc.txt");
-	file_myDoc_txt.Path("/User/lindebear/Documents");
+	file_myDoc_txt.Path("/lindebear/Documents");
 	file_myDoc_txt.DateCreated(date_created);
 	file_myDoc_txt.DateModified();
 	file_myDoc_txt.Permissions(755);
@@ -115,19 +126,13 @@ int main(int argc, char const *argv[]) {
 	file_myDoc_txt.Size(423);
 	file_myDoc_txt.FileType(sysnap::REGULAR_FILE);
 
-	dir_documents.InsertContent(file_myDoc_txt);
-	dir_lindebear.InsertContent(dir_documents);
-	dir_lindebear.InsertContent(dir_desktop);
-	dir_lindebear.InsertContent(dir_applications);
+	mySystem._Insert_(file_myDoc_txt);
+	mySystem.Print();
 
-	std::cout 			<< dir_lindebear.Name() << "\n";
-	std::cout << "\t"	<< dir_lindebear[0].Name() << "\n";
-	std::cout << "\t\t"	<< dir_lindebear[0][0].Name() << "\n";
-	std::cout << "\t"	<< dir_lindebear[1].Name() << "\n";
-	std::cout << "\t"	<< dir_lindebear[2].Name() << "\n\n";
+	sysnap::Path_t my_path;
+	my_path = "/";
 
-	sysnap::Path_t a_test_path("/User/lindebear/Documents/myDoc.txt");
-	std::cout << "A simple query: " << dir_lindebear[a_test_path[2]][a_test_path[3]].Name() << "\n";
+	std::cout << "Test Path: " << my_path << "\n";
 
 	return 0;
 }

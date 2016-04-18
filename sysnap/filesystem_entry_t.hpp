@@ -2,6 +2,7 @@
 #include <vector>
 #include <ctime>
 #include <iostream>
+#include "path_t.hpp"
 
 #ifndef SYSNAP_FILESYSTEM_ENTRY_HPP
 #define SYSNAP_FILESYSTEM_ENTRY_HPP
@@ -37,7 +38,7 @@ namespace sysnap {
 	class FileSystemEntry_t {
 	private:
 		std::string 					name_m;
-		std::string						path_m;
+		Path_t							path_m;
 		Timestamp_t						date_created_m;
 		Timestamp_t						date_modified_m;
 		PermissionsFlag_t				permissions_m;
@@ -54,6 +55,7 @@ namespace sysnap {
 		/*---> SETTERS <---*/
 		void Name(std::string _name);
 		void Path(std::string _path);
+		void Path(Path_t _path);
 		void DateCreated(Timestamp_t _date_created);
 		void DateCreated(int _day, int _month, int _year,
 						 int _hour, int _minute, int _second,
@@ -70,11 +72,10 @@ namespace sysnap {
 		void Size(unsigned long _size);
 		void FileType(UNIX_FILE_t _file_type);
 		void InsertContent(FileSystemEntry_t _fs_entry);
-		void InsertContent(FileSystemEntry_t _fs_entry, std::string _);
 
 		/*---> GETTERS <---*/
 		std::string						Name();
-		std::string						Path();
+		Path_t							Path();
 		Timestamp_t						DateCreated();
 		Timestamp_t						DateModified();
 		PermissionsFlag_t				Permissions();
@@ -83,10 +84,12 @@ namespace sysnap {
 		unsigned long					Size();
 		UNIX_FILE_t						FileType();
 		std::vector<FileSystemEntry_t>	Content();
+		FileSystemEntry_t*				Find(std::string);
+		bool							Empty();
 
 		/*---> OPERATORS <---*/
 		FileSystemEntry_t operator[](int _index);
-		FileSystemEntry_t operator[](std::string _name);
+		FileSystemEntry_t& operator[](std::string _name);
 	};
 }
 

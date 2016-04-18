@@ -81,6 +81,12 @@ namespace sysnap {
 	}
 
 	void FileSystemEntry_t::Path(std::string _path) {
+		Path_t path_tmp = _path;
+
+		this->path_m = path_tmp;
+	}
+
+	void FileSystemEntry_t::Path(Path_t _path) {
 		this->path_m = _path;
 	}
 
@@ -146,7 +152,6 @@ namespace sysnap {
 		this->file_type_m = _file_type;
 	}
 
-
 	void FileSystemEntry_t::InsertContent(FileSystemEntry_t _fs_entry) {
 		this->content_m.push_back(_fs_entry);
 	}
@@ -156,7 +161,7 @@ namespace sysnap {
 		return this->name_m;
 	}
 
-	std::string						FileSystemEntry_t::Path() {
+	Path_t							FileSystemEntry_t::Path() {
 		return this->path_m;
 	}
 
@@ -192,22 +197,28 @@ namespace sysnap {
 		return this->content_m;
 	}
 
+	FileSystemEntry_t*				FileSystemEntry_t::Find(std::string _name) {
+		for(std::vector<FileSystemEntry_t>::iterator iter = this->content_m.begin();
+		iter != this->content_m.end();
+		iter++) {
+			if(iter->Name() == _name) {
+				return &(*iter);
+			}
+		}
+
+		return NULL;
+	}
+
+	bool 							FileSystemEntry_t::Empty() {
+		return this->content_m.empty();
+	}
+
 	/*---> OPERATORS <---*/
 	FileSystemEntry_t FileSystemEntry_t::operator[](int _index) {
 		return this->content_m[_index];
 	}
 
-	FileSystemEntry_t FileSystemEntry_t::operator[](std::string _name) {
-		for(std::vector<FileSystemEntry_t>::iterator iter = this->content_m.begin();
-		iter != this->content_m.end();
-		iter++) {
-			if(iter->Name() == _name) {
-				return *iter;
-			}
-		}
-
-		FileSystemEntry_t EmptyEntry;
-
-		return EmptyEntry;
+	FileSystemEntry_t& FileSystemEntry_t::operator[](std::string _name) {
+		return *(this->Find(_name));
 	}
 }
