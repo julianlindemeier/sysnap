@@ -1,4 +1,4 @@
-#include "filesystem.hpp"
+#include "filesystem_entry_t.hpp"
 
 namespace sysnap {
 	/* * * * * * * *
@@ -192,10 +192,22 @@ namespace sysnap {
 		return this->content_m;
 	}
 
+	/*---> OPERATORS <---*/
+	FileSystemEntry_t FileSystemEntry_t::operator[](int _index) {
+		return this->content_m[_index];
+	}
 
-	/* * * * * * * * *
-	 * FileSystem_t  *
-	 * * * * * * * * */
-	/*---> CONSTRUCTOR <---*/
-	
+	FileSystemEntry_t FileSystemEntry_t::operator[](std::string _name) {
+		for(std::vector<FileSystemEntry_t>::iterator iter = this->content_m.begin();
+		iter != this->content_m.end();
+		iter++) {
+			if(iter->Name() == _name) {
+				return *iter;
+			}
+		}
+
+		FileSystemEntry_t EmptyEntry;
+
+		return EmptyEntry;
+	}
 }

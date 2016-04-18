@@ -3,8 +3,8 @@
 #include <ctime>
 #include <iostream>
 
-#ifndef FILESYSTEM_HPP
-#define FILESYSTEM_HPP
+#ifndef SYSNAP_FILESYSTEM_ENTRY_HPP
+#define SYSNAP_FILESYSTEM_ENTRY_HPP
 
 namespace sysnap {
 	struct Timestamp_t {
@@ -32,50 +32,6 @@ namespace sysnap {
 		NAMED_PIPE,
 		SOCKET,
 		CHAR_BLOCK_DEVICE
-	};
-
-	class Path {
-	private:
-		std::vector<std::string> path_m;
-
-	public:
-		Path();
-		Path(std::string _path) {
-			this->path_m = this->_DecomposePath_(_path);
-		}
-		~Path() {}
-
-		void Print() {
-			for(std::vector<std::string>::iterator iter = this->path_m.begin();
-			iter != this->path_m.end();
-			iter++) {
-				std::cout << iter->data() << "\n";
-			}
-		}
-
-	private:
-		std::vector<std::string> _DecomposePath_(std::string _path) {
-			std::vector<std::string> ret_path_decomposed;
-
-			//Put string in proper form to analyze, in case it's needed:
-			if(_path[0] == '/') {
-				_path = _path.substr(1);
-			}
-
-			if(_path[_path.size()-1] != '/') {
-				_path += '/';
-			}
-
-			size_t pos = 0;
-			std::string token;
-			while ((pos = _path.find('/')) != std::string::npos) {
-    			token = _path.substr(0, pos);
-				ret_path_decomposed.push_back(token);
-    			_path.erase(0, pos + 1);
-			}
-
-			return ret_path_decomposed;
-		}
 	};
 
 	class FileSystemEntry_t {
@@ -127,19 +83,10 @@ namespace sysnap {
 		unsigned long					Size();
 		UNIX_FILE_t						FileType();
 		std::vector<FileSystemEntry_t>	Content();
-	};
 
-	class FileSystem_t {
-	private:
-		FileSystemEntry_t system_m;
-
-	public:
-		FileSystem_t();
-		~FileSystem_t();
-
-		void Scan();
-		void Print();
-		void ExportAsXML();
+		/*---> OPERATORS <---*/
+		FileSystemEntry_t operator[](int _index);
+		FileSystemEntry_t operator[](std::string _name);
 	};
 }
 

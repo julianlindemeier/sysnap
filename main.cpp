@@ -120,17 +120,14 @@ int main(int argc, char const *argv[]) {
 	dir_lindebear.InsertContent(dir_desktop);
 	dir_lindebear.InsertContent(dir_applications);
 
-
 	std::cout 			<< dir_lindebear.Name() << "\n";
-	std::cout << "\t"	<< dir_lindebear.Content().at(0).Name() << "\n";
-	std::cout << "\t\t"	<< dir_lindebear.Content().at(0).Content().at(0).Name() << "\n";
-	std::cout << "\t"	<< dir_lindebear.Content().at(1).Name() << "\n";
-	std::cout << "\t"	<< dir_lindebear.Content().at(2).Name() << "\n\n";
+	std::cout << "\t"	<< dir_lindebear[0].Name() << "\n";
+	std::cout << "\t\t"	<< dir_lindebear[0][0].Name() << "\n";
+	std::cout << "\t"	<< dir_lindebear[1].Name() << "\n";
+	std::cout << "\t"	<< dir_lindebear[2].Name() << "\n\n";
 
-	sysnap::Path mypath("/das/ist/ein/test");
-
-	mypath.Print();
-
+	sysnap::Path_t a_test_path("/User/lindebear/Documents/myDoc.txt");
+	std::cout << "A simple query: " << dir_lindebear[a_test_path[2]][a_test_path[3]].Name() << "\n";
 
 	return 0;
 }
