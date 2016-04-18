@@ -2,5 +2,6 @@
 #define SYSNAP_H
 
 #include "auxilliary.hpp"
+#include "filesystem.hpp"
 
 #endif
