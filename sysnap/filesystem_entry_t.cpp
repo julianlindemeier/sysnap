@@ -1,45 +1,6 @@
 #include "filesystem_entry_t.hpp"
 
 namespace sysnap {
-	/* * * * * * * *
-	 * Timestamp_t *
-	 * * * * * * * */
-	Timestamp_t GetLocalTime() {
-		std::time_t	t;
-		std::tm*	local_time;
-		Timestamp_t	ret_time;
-
-		t = std::time(NULL);
-		local_time = std::localtime(&t);
-
-		ret_time.day	= local_time->tm_mday;
-		ret_time.month	= local_time->tm_mon;
-		ret_time.year	= local_time->tm_year + 1900;
-		ret_time.hour	= local_time->tm_hour;
-		ret_time.minute	= local_time->tm_min;
-		ret_time.second	= local_time->tm_sec;
-		ret_time.zone	= local_time->tm_zone;
-
-		return ret_time;
-	}
-
-	/* * * * * * * * * * *
-	 * PermissionsFlag_t *
-	 * * * * * * * * * * */
-	PermissionsFlag_t GetPermissionsFlag(int _perms_flag) {
-		PermissionsFlag_t ret_perm_flags;
-
-		ret_perm_flags.owner	= (_perms_flag / 100) % 10;
-		ret_perm_flags.group	= (_perms_flag /  10) % 10;
-		ret_perm_flags.others	= (_perms_flag /   1) % 10;
-
-
-		return ret_perm_flags;
-	}
-
-	/* * * * * * * * * * *
-	 * FileSystemEntry_t *
-	 * * * * * * * * * * */
 	/*---> CONSTRUCTOR <---*/
 	FileSystemEntry_t::FileSystemEntry_t() {
 		this->name_m					= "";
@@ -51,7 +12,7 @@ namespace sysnap {
 		this->date_created_m.hour		= 0;
 		this->date_created_m.minute		= 0;
 		this->date_created_m.second		= 0;
-		this->date_created_m.zone		= NULL;
+		this->date_created_m.zone		= (char*)"";
 
 		this->date_modified_m.day		= 0;
 		this->date_modified_m.month		= 0;
@@ -59,7 +20,7 @@ namespace sysnap {
 		this->date_modified_m.hour		= 0;
 		this->date_modified_m.minute	= 0;
 		this->date_modified_m.second	= 0;
-		this->date_modified_m.zone		= NULL;
+		this->date_modified_m.zone		= (char*)"";
 
 		this->permissions_m.owner		= 0;
 		this->permissions_m.group		= 0;
@@ -81,9 +42,7 @@ namespace sysnap {
 	}
 
 	void FileSystemEntry_t::Path(std::string _path) {
-		Path_t path_tmp = _path;
-
-		this->path_m = path_tmp;
+		this->path_m = _path;
 	}
 
 	void FileSystemEntry_t::Path(Path_t _path) {
@@ -214,11 +173,11 @@ namespace sysnap {
 	}
 
 	/*---> OPERATORS <---*/
-	FileSystemEntry_t FileSystemEntry_t::operator[](int _index) {
+	FileSystemEntry_t 				FileSystemEntry_t::operator[](int _index) {
 		return this->content_m[_index];
 	}
 
-	FileSystemEntry_t& FileSystemEntry_t::operator[](std::string _name) {
+	FileSystemEntry_t& 				FileSystemEntry_t::operator[](std::string _name) {
 		return *(this->Find(_name));
 	}
 }

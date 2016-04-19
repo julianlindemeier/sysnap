@@ -14,10 +14,11 @@ namespace sysnap {
 		FileSystem_t();
 		~FileSystem_t();
 
-		void Scan(Path_t _path);
+		void Scan(std::string _path);
 		void Print();
 		void ExportAsXML();
 
+	//TODO: change back to private!!!
 	public:
 		void _Insert_(FileSystemEntry_t& _entry);
 		void _Print_(FileSystemEntry_t _entry);

@@ -1,5 +1,6 @@
-#include <iostream>
 #include "path_t.hpp"
+#include <iostream>
+#include <boost/filesystem.hpp>
 
 namespace sysnap {
 	Path_t::Path_t() {
@@ -14,6 +15,26 @@ namespace sysnap {
 
 	}
 
+	boost::filesystem::path Path_t::GetBoostPath() {
+		boost::filesystem::path ret_path = this->GetString();
+
+		return ret_path;
+	}
+
+	std::string Path_t::GetString() {
+		std::string ret_str = "";
+
+		ret_str += "/";
+
+		for(std::vector<std::string>::iterator iter = this->path_m.begin();
+		iter != this->path_m.end();
+		iter++) {
+			ret_str += (*iter + "/");
+		}
+
+		return ret_str;
+	}
+
 	void Path_t::Path(std::string _path) {
 		this->path_m = this->_DecomposePath_(_path);
 	}
@@ -25,8 +46,10 @@ namespace sysnap {
 		return this->path_m.size();
 	}
 
-	void Path_t::operator=(std::string _path) {
+	Path_t& Path_t::operator=(std::string _path) {
 		this->path_m = this->_DecomposePath_(_path);
+
+		return *this;
 	}
 
 	bool Path_t::operator==(const Path_t& _path) {
@@ -45,10 +68,11 @@ namespace sysnap {
 		iter++) {
 			_out << *iter << "/";
 		}
-		
+
 		return _out;
 	}
 
+	//---> PRIVATE <--
 	std::vector<std::string> Path_t::_DecomposePath_(std::string _path) {
 		std::vector<std::string> ret_path_decomposed;
 

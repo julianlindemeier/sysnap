@@ -49,8 +49,6 @@ int main(int argc, char const *argv[]) {
 		}
 	}
 
-	std::cout << "Path: " << path << "\n";
-
 	//TODO: Add File system Analyzer
 	//TODO: Add XML-Writer
 	//TODO: Add XML-Support
@@ -78,8 +76,6 @@ int main(int argc, char const *argv[]) {
 	dir_lindebear.Size(12394871974);
 	dir_lindebear.FileType(sysnap::DIRECTORY);
 
-	mySystem._Insert_(dir_lindebear);
-
 	dir_applications.Name("Applications");
 	dir_applications.Path("/lindebear");
 	dir_applications.DateCreated(date_created);
@@ -89,8 +85,6 @@ int main(int argc, char const *argv[]) {
 	dir_applications.Group("staff");
 	dir_applications.Size(31123);
 	dir_applications.FileType(sysnap::DIRECTORY);
-
-	mySystem._Insert_(dir_applications);
 
 	dir_desktop.Name("Desktop");
 	dir_desktop.Path("/lindebear");
@@ -102,8 +96,6 @@ int main(int argc, char const *argv[]) {
 	dir_desktop.Size(35134);
 	dir_desktop.FileType(sysnap::DIRECTORY);
 
-	mySystem._Insert_(dir_desktop);
-
 	dir_documents.Name("Documents");
 	dir_documents.Path("/lindebear");
 	dir_documents.DateCreated(date_created);
@@ -113,8 +105,6 @@ int main(int argc, char const *argv[]) {
 	dir_documents.Group("staff");
 	dir_documents.Size(4789475);
 	dir_documents.FileType(sysnap::DIRECTORY);
-
-	mySystem._Insert_(dir_documents);
 
 	file_myDoc_txt.Name("myDoc.txt");
 	file_myDoc_txt.Path("/lindebear/Documents");
@@ -126,13 +116,15 @@ int main(int argc, char const *argv[]) {
 	file_myDoc_txt.Size(423);
 	file_myDoc_txt.FileType(sysnap::REGULAR_FILE);
 
+	mySystem._Insert_(dir_lindebear);
+	mySystem._Insert_(dir_applications);
+	mySystem._Insert_(dir_desktop);
+	mySystem._Insert_(dir_documents);
 	mySystem._Insert_(file_myDoc_txt);
+
 	mySystem.Print();
 
-	sysnap::Path_t my_path;
-	my_path = "/";
-
-	std::cout << "Test Path: " << my_path << "\n";
+	mySystem.Scan("/lindebear");
 
 	return 0;
 }

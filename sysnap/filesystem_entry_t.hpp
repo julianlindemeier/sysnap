@@ -18,13 +18,15 @@ namespace sysnap {
 		char*	zone;
 	};
 	Timestamp_t GetLocalTime();
+	std::string	GetTimeString(Timestamp_t _local_time);
 
 	struct PermissionsFlag_t {
 		int owner;
 		int group;
 		int others;
 	};
-	PermissionsFlag_t GetPermissionsFlag(int _perms_flag);
+	PermissionsFlag_t	GetPermissionsFlag(int _perms_flag);
+	std::string			GetPermissionsString(PermissionsFlag_t _perms_flag);
 
 	enum UNIX_FILE_t {
 		REGULAR_FILE = 0,
@@ -34,6 +36,7 @@ namespace sysnap {
 		SOCKET,
 		CHAR_BLOCK_DEVICE
 	};
+	std::string	GetFileTypeString(UNIX_FILE_t _file_type);
 
 	class FileSystemEntry_t {
 	private:
