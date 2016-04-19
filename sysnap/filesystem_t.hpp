@@ -20,8 +20,9 @@ namespace sysnap {
 
 	//TODO: change back to private!!!
 	public:
-		void _Insert_(FileSystemEntry_t& _entry);
+		void _Insert_(FileSystemEntry_t _entry);
 		void _Print_(FileSystemEntry_t _entry);
+		void _Scan_(boost::filesystem::path _dir_path);
 	};
 }
 

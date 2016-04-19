@@ -9,6 +9,7 @@
 #include <termcolor/termcolor.hpp>
 #include <pugixml.hpp>
 #include <vector>
+#include <boost/filesystem.hpp>
 
 #include "sysnap/sysnap.hpp"
 
@@ -54,77 +55,10 @@ int main(int argc, char const *argv[]) {
 	//TODO: Add XML-Support
 	//TODO: Add Comparator
 
-	sysnap::Timestamp_t date_created;
-	date_created = sysnap::GetLocalTime();
-
-	sysnap::FileSystemEntry_t my_system;
-	sysnap::FileSystemEntry_t dir_lindebear;
-	sysnap::FileSystemEntry_t dir_applications;
-	sysnap::FileSystemEntry_t dir_desktop;
-	sysnap::FileSystemEntry_t dir_documents;
-	sysnap::FileSystemEntry_t file_myDoc_txt;
-
 	sysnap::FileSystem_t mySystem;
 
-	dir_lindebear.Name("lindebear");
-	dir_lindebear.Path("/");
-	dir_lindebear.DateCreated(date_created);
-	dir_lindebear.DateModified();
-	dir_lindebear.Permissions(755);
-	dir_lindebear.Owner("lindebear");
-	dir_lindebear.Group("staff");
-	dir_lindebear.Size(12394871974);
-	dir_lindebear.FileType(sysnap::DIRECTORY);
-
-	dir_applications.Name("Applications");
-	dir_applications.Path("/lindebear");
-	dir_applications.DateCreated(date_created);
-	dir_applications.DateModified();
-	dir_applications.Permissions(755);
-	dir_applications.Owner("lindebear");
-	dir_applications.Group("staff");
-	dir_applications.Size(31123);
-	dir_applications.FileType(sysnap::DIRECTORY);
-
-	dir_desktop.Name("Desktop");
-	dir_desktop.Path("/lindebear");
-	dir_desktop.DateCreated(date_created);
-	dir_desktop.DateModified();
-	dir_desktop.Permissions(755);
-	dir_desktop.Owner("lindebear");
-	dir_desktop.Group("staff");
-	dir_desktop.Size(35134);
-	dir_desktop.FileType(sysnap::DIRECTORY);
-
-	dir_documents.Name("Documents");
-	dir_documents.Path("/lindebear");
-	dir_documents.DateCreated(date_created);
-	dir_documents.DateModified();
-	dir_documents.Permissions(755);
-	dir_documents.Owner("lindebear");
-	dir_documents.Group("staff");
-	dir_documents.Size(4789475);
-	dir_documents.FileType(sysnap::DIRECTORY);
-
-	file_myDoc_txt.Name("myDoc.txt");
-	file_myDoc_txt.Path("/lindebear/Documents");
-	file_myDoc_txt.DateCreated(date_created);
-	file_myDoc_txt.DateModified();
-	file_myDoc_txt.Permissions(755);
-	file_myDoc_txt.Owner("lindebear");
-	file_myDoc_txt.Group("staff");
-	file_myDoc_txt.Size(423);
-	file_myDoc_txt.FileType(sysnap::REGULAR_FILE);
-
-	mySystem._Insert_(dir_lindebear);
-	mySystem._Insert_(dir_applications);
-	mySystem._Insert_(dir_desktop);
-	mySystem._Insert_(dir_documents);
-	mySystem._Insert_(file_myDoc_txt);
-
+	mySystem.Scan(path);
 	mySystem.Print();
-
-	mySystem.Scan("/lindebear");
 
 	return 0;
 }

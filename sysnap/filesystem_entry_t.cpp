@@ -6,14 +6,6 @@ namespace sysnap {
 		this->name_m					= "";
 		this->path_m					= "";
 
-		this->date_created_m.day		= 0;
-		this->date_created_m.month		= 0;
-		this->date_created_m.year		= 0;
-		this->date_created_m.hour		= 0;
-		this->date_created_m.minute		= 0;
-		this->date_created_m.second		= 0;
-		this->date_created_m.zone		= (char*)"";
-
 		this->date_modified_m.day		= 0;
 		this->date_modified_m.month		= 0;
 		this->date_modified_m.year		= 0;
@@ -47,22 +39,6 @@ namespace sysnap {
 
 	void FileSystemEntry_t::Path(Path_t _path) {
 		this->path_m = _path;
-	}
-
-	void FileSystemEntry_t::DateCreated(Timestamp_t _date_created) {
-		this->date_created_m = _date_created;
-	}
-
-	void FileSystemEntry_t::DateCreated(int _day, int _month, int _year,
-									  int _hour, int _minute, int _second,
-									  char *_zone) {
-		this->date_created_m.day 		= _day;
-		this->date_created_m.month 		= _month;
-		this->date_created_m.year 		= _year;
-		this->date_created_m.hour 		= _hour;
-		this->date_created_m.minute 	= _minute;
-		this->date_created_m.second 	= _second;
-		this->date_created_m.zone		= _zone;
 	}
 
 	void FileSystemEntry_t::DateModified(Timestamp_t _date_modified) {
@@ -124,10 +100,6 @@ namespace sysnap {
 		return this->path_m;
 	}
 
-	Timestamp_t						FileSystemEntry_t::DateCreated() {
-		return this->date_created_m;
-	}
-
 	Timestamp_t						FileSystemEntry_t::DateModified() {
 		return this->date_modified_m;
 	}
@@ -165,7 +137,7 @@ namespace sysnap {
 			}
 		}
 
-		return NULL;
+		return this;
 	}
 
 	bool 							FileSystemEntry_t::Empty() {

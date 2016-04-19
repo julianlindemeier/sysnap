@@ -1,6 +1,7 @@
 #include "auxilliary.hpp"
 #include <iostream>
 #include <vector>
+#include <cmath>
 #include "filesystem_entry_t.hpp"
 
 namespace sysnap {
@@ -52,15 +53,31 @@ namespace sysnap {
 	}
 
 	/* * * * * * * *
+	 * Math Stuff  *
+	 * * * * * * * */
+	int dec2oct(int _dec) {
+		int oct = 0, digit = 0;
+
+		while(_dec > 0) {
+			oct += (_dec % 8) * pow(8, digit++);
+
+			_dec /= 8;
+		}
+
+		return oct;
+	}
+
+	/* * * * * * * *
 	 * Timestamp_t *
 	 * * * * * * * */
-	Timestamp_t GetLocalTime() {
-		std::time_t	t;
+	Timestamp_t GetLocalTime(std::time_t _time) {
+		if(_time == 0) {
+			_time = std::time(NULL);
+		}
 		std::tm*	local_time;
 		Timestamp_t	ret_time;
 
-		t = std::time(NULL);
-		local_time = std::localtime(&t);
+		local_time = std::localtime(&_time);
 
 		ret_time.day	= local_time->tm_mday;
 		ret_time.month	= local_time->tm_mon;
@@ -75,9 +92,13 @@ namespace sysnap {
 	std::string	GetTimeString(Timestamp_t _local_time) {
 		std::string ret_local_time_string;
 
-		ret_local_time_string = std::to_string(_local_time.day)  + "." + std::to_string(_local_time.month)  + "." + std::to_string(_local_time.year) + " "
-							  + std::to_string(_local_time.hour) + ":" + std::to_string(_local_time.minute) + ":" + std::to_string(_local_time.second) + " ("
-							  + _local_time.zone + ")";
+		ret_local_time_string =  ((std::to_string(_local_time.day).size()    == 2) ? std::to_string(_local_time.day)    : "0" + std::to_string(_local_time.day))    + ".";
+		ret_local_time_string += ((std::to_string(_local_time.month).size()  == 2) ? std::to_string(_local_time.month)  : "0" + std::to_string(_local_time.month))  + ".";
+		ret_local_time_string +=   std::to_string(_local_time.year) + " ";
+		ret_local_time_string += ((std::to_string(_local_time.hour).size()   == 2) ? std::to_string(_local_time.hour)   : "0" + std::to_string(_local_time.hour))   + ":";
+		ret_local_time_string += ((std::to_string(_local_time.minute).size() == 2) ? std::to_string(_local_time.minute) : "0" + std::to_string(_local_time.minute)) + ":";
+		ret_local_time_string += ((std::to_string(_local_time.second).size() == 2) ? std::to_string(_local_time.second) : "0" + std::to_string(_local_time.second)) + " ";
+		ret_local_time_string += "(" + std::string(_local_time.zone) + ")";
 
 		return ret_local_time_string;
 	}
@@ -185,6 +206,38 @@ namespace sysnap {
 	/* * * * * * * *
 	 * UNIX_FILE_t *
 	 * * * * * * * */
+	UNIX_FILE_t	BoostFileType2UNIX_FILE_t(boost::filesystem::file_type _boost_file_type) {
+		UNIX_FILE_t ret_file_type;
+		switch(_boost_file_type) {
+			case boost::filesystem::regular_file:
+				ret_file_type = REGULAR_FILE;
+				break;
+			case boost::filesystem::directory_file:
+				ret_file_type = DIRECTORY;
+				break;
+			case boost::filesystem::symlink_file:
+				ret_file_type = SYMLINK;
+				break;
+			case boost::filesystem::block_file:
+				ret_file_type = BLOCK_DEVICE;
+				break;
+			case boost::filesystem::character_file:
+				ret_file_type = CHARACTER_DEVICE;
+				break;
+			case boost::filesystem::fifo_file:
+				ret_file_type = FIFO;
+				break;
+			case boost::filesystem::socket_file:
+				ret_file_type = SOCKET;
+				break;
+			default:
+				ret_file_type = UNKNOWN;
+				break;
+		}
+
+		return ret_file_type;
+	}
+
 	std::string	GetFileTypeString(UNIX_FILE_t _file_type) {
 		std::string ret_file_type_string;
 
@@ -198,14 +251,17 @@ namespace sysnap {
 			case SYMLINK:
 				ret_file_type_string = "Symlink";
 				break;
-			case NAMED_PIPE:
-				ret_file_type_string = "Named Pipe";
+			case BLOCK_DEVICE:
+				ret_file_type_string = "Block Device";
+				break;
+			case CHARACTER_DEVICE:
+				ret_file_type_string = "Character Device";
+				break;
+			case FIFO:
+				ret_file_type_string = "FIFO File";
 				break;
 			case SOCKET:
 				ret_file_type_string = "Socket";
-				break;
-			case CHAR_BLOCK_DEVICE:
-				ret_file_type_string = "Character/Block Device";
 				break;
 			default:
 				ret_file_type_string = "Unknown File Type";
@@ -213,6 +269,40 @@ namespace sysnap {
 		}
 
 		return ret_file_type_string;
+	}
+
+	/* * * * * * * * * * * * *
+	 * Not covered by boost  *
+	 * * * * * * * * * * * * */
+	std::string GetOwner(boost::filesystem::path _path) {
+		struct ::stat 			info;
+		::stat(_path.string().c_str(), &info);
+		struct ::passwd *pw = getpwuid(info.st_uid);
+
+		return std::string(pw->pw_name);
+	}
+	std::string GetGroup(boost::filesystem::path _path) {
+		struct ::stat 			info;
+		::stat(_path.string().c_str(), &info);
+		struct ::group  *gr = getgrgid(info.st_gid);
+
+		return std::string(gr->gr_name);
+	}
+
+	unsigned long GetSize(boost::filesystem::path _path) {
+		if(boost::filesystem::is_regular_file(_path)) {
+			return boost::filesystem::file_size(_path);
+		}
+
+		unsigned long size_tmp=0;
+    	for(boost::filesystem::recursive_directory_iterator rcrsv_iter(_path);
+        rcrsv_iter != boost::filesystem::recursive_directory_iterator();
+        ++rcrsv_iter) {
+        	if(!boost::filesystem::is_directory(*rcrsv_iter))
+            	size_tmp += boost::filesystem::file_size(*rcrsv_iter);
+    	}
+
+		return size_tmp;
 	}
 }
 
