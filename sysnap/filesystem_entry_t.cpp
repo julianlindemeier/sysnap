@@ -25,7 +25,13 @@ namespace sysnap {
 
 		this->file_type_m				= REGULAR_FILE;
 
-		this->content_m.clear();
+		//this->content_m.clear();
+	}
+
+	FileSystemEntry_t::~FileSystemEntry_t() {
+		if(!this->content_m.empty()) {
+			this->content_m.clear();
+		}
 	}
 
 	/*---> SETTERS <---*/
@@ -137,7 +143,7 @@ namespace sysnap {
 			}
 		}
 
-		return this;
+		return NULL;
 	}
 
 	bool 							FileSystemEntry_t::Empty() {
@@ -145,11 +151,11 @@ namespace sysnap {
 	}
 
 	/*---> OPERATORS <---*/
-	FileSystemEntry_t 				FileSystemEntry_t::operator[](int _index) {
+	FileSystemEntry_t& 				FileSystemEntry_t::operator[](int _index) {
 		return this->content_m[_index];
 	}
 
-	FileSystemEntry_t& 				FileSystemEntry_t::operator[](std::string _name) {
+	FileSystemEntry_t&				FileSystemEntry_t::operator[](std::string _name) {
 		return *(this->Find(_name));
 	}
 }

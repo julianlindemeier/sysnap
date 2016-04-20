@@ -11,11 +11,11 @@ namespace sysnap {
 	}
 
 	FileSystem_t::~FileSystem_t() {
-
+		delete this->system_m;
 	}
 
-	void FileSystem_t::Scan(std::string _path) {
-		boost::filesystem::path	dir_path(_path);
+	void FileSystem_t::Scan(Path_t _path) {
+		boost::filesystem::path	dir_path(_path.GetString());
 
 		//Here comes the boost stuff!
 		try {
@@ -29,40 +29,37 @@ namespace sysnap {
 
 	void FileSystem_t::Print() {
 		this->_Print_(*this->system_m);
+		//std::cout << "Path of system_m" << this->system_m->Path() << "\n";
 	}
 
 	void FileSystem_t::ExportAsXML() {
-
+		//TODO: Finish FileSystem_t::ExportAsXML()-function.
 	}
 
 	void FileSystem_t::_Insert_(FileSystemEntry_t _entry) {
 		//Check if we don't have a root directory:
 		if(this->system_m == NULL) {
-			this->system_m = &_entry;
+			FileSystemEntry_t *new_entry = new FileSystemEntry_t;
+			*new_entry = _entry;
+
+			this->system_m = new_entry;
 			return;
 		}
 
 
 		//In case the root directory is already saved, iterate through it's content:
 		FileSystemEntry_t* dir_iter = this->system_m;
-		for(int i=1; i < _entry.Path().Levels()-1; i++) {
-			//if the directory is empty, we cannot dig any further.
-			if(dir_iter->Empty()) {
-				break;
+
+		for(int i = this->system_m->Path().Levels()+1; i < _entry.Path().Levels(); i++) {
+			if((dir_iter = dir_iter->Find(_entry.Path()[i])) == NULL) {
+				std::cout << "Could not find " << _entry.Path()[i] << "\n";
 			}
-
-			//std::cout << "Trying to find: " << _entry.Path()[i] << " within " << dir_iter->Name() << "\n";
-
-			//if the iterator points to an entry, which is not a directory, start over.
-			if(dir_iter->FileType() != DIRECTORY) {
-				continue;
-			}
-
-			dir_iter = dir_iter->Find(_entry.Path()[i]);
 		}
 
 		//insert the entry into the desired directory.
 		dir_iter->InsertContent(_entry);
+
+		return;
 	}
 
 	void FileSystem_t::_Print_(FileSystemEntry_t _entry) {
@@ -72,20 +69,25 @@ namespace sysnap {
 			level_indent += "\t";
 		}
 
-		std::cout << level_indent << "-------------------------------------------\n";
-		std::cout << level_indent << "Name:        " << _entry.Name() << "\n";
-		std::cout << level_indent << "Path:        " << _entry.Path() << "\n";
-		std::cout << level_indent << "Modified:    " << GetTimeString(_entry.DateModified()) << "\n";
-		std::cout << level_indent << "Permissions: " << GetPermissionsString(_entry.Permissions()) << "\n";
-		std::cout << level_indent << "Owner:       " << _entry.Owner() << "\n";
-		std::cout << level_indent << "Group:       " << _entry.Group() << "\n";
-		std::cout << level_indent << "Size:        " << _entry.Size()/1024.0f << " KBytes\n";
-		std::cout << level_indent << "File Type:   " << GetFileTypeString(_entry.FileType()) << "\n";
-		std::cout << level_indent << "-------------------------------------------\n";
+		//std::cout << level_indent << "+------------------------------------------\n";
+		std::cout << level_indent << "| Name:        " << _entry.Name() << "\n";
+		//std::cout << level_indent << "| Path:        " << _entry.Path() << "\n";
+		//std::cout << level_indent << "| Modified:    " << GetTimeString(_entry.DateModified()) << "\n";
+		//std::cout << level_indent << "| Permissions: " << GetPermissionsString(_entry.Permissions()) << "\n";
+		//std::cout << level_indent << "| Owner:       " << _entry.Owner() << "\n";
+		//std::cout << level_indent << "| Group:       " << _entry.Group() << "\n";
+		std::cout << level_indent << "| Size:        " << sysnap::ByteSuffix(_entry.Size()) << "\n";
+		//std::cout << level_indent << "| File Type:   " << GetFileTypeString(_entry.FileType()) << "\n";
+		std::cout << level_indent << "+------------------------------------------\n";
 
 		if(!_entry.Empty()) {
-			for(int i = 0; i < _entry.Content().size(); i++) {
-				this->_Print_(_entry[i]);
+			std::vector<FileSystemEntry_t> content;
+			content = _entry.Content();
+
+			for(std::vector<FileSystemEntry_t>::iterator iter = content.begin();
+			iter != content.end();
+			iter++) {
+				this->_Print_(*iter);
 			}
 		}
 
@@ -119,14 +121,12 @@ namespace sysnap {
 		for(boost::filesystem::directory_iterator dir_iter(_path);
 		dir_iter != dir_iter_end;
 		++dir_iter) {
-			//std::cout << dir_iter->path() << "\n";
 			paths.push_back(dir_iter->path());
 		}
 
 		for(std::vector<boost::filesystem::path>::iterator paths_iter = paths.begin();
 		paths_iter != paths.end();
 		paths_iter++) {
-			//std::cout << "Scanning... " << (*paths_iter).string() << "\n";
 			this->_Scan_(*paths_iter);
 		}
 	}

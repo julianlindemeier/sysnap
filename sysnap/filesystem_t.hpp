@@ -14,7 +14,7 @@ namespace sysnap {
 		FileSystem_t();
 		~FileSystem_t();
 
-		void Scan(std::string _path);
+		void Scan(Path_t _path);
 		void Print();
 		void ExportAsXML();
 

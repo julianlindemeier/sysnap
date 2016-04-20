@@ -17,7 +17,7 @@
 
 
 int main(int argc, char const *argv[]) {
-	std::string path;
+	sysnap::Path_t path;
 	std::vector<std::string> args;
 	std::vector< std::pair<std::string, std::string> > args_table;
 
@@ -50,15 +50,18 @@ int main(int argc, char const *argv[]) {
 		}
 	}
 
-	//TODO: Add File system Analyzer
+	std::cout << "Scanning " << path << "\n";
+
 	//TODO: Add XML-Writer
-	//TODO: Add XML-Support
+	//TODO: Add XML-Reader
 	//TODO: Add Comparator
 
 	sysnap::FileSystem_t mySystem;
 
 	mySystem.Scan(path);
 	mySystem.Print();
+
+	sysnap::Path_t path1, path2;
 
 	return 0;
 }

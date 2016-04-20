@@ -32,7 +32,7 @@ namespace sysnap {
 			ret_str += (*iter + "/");
 		}
 
-		return ret_str;
+		return ret_str.substr(0, ret_str.size()-1);
 	}
 
 	void Path_t::Path(std::string _path) {
@@ -61,13 +61,7 @@ namespace sysnap {
 	}
 
 	std::ostream& operator<<(std::ostream &_out, Path_t _path) {
-		_out << "/";
-
-		for(std::vector<std::string>::iterator iter = _path.path_m.begin();
-		iter != _path.path_m.end();
-		iter++) {
-			_out << *iter << "/";
-		}
+		_out << _path.GetString();
 
 		return _out;
 	}

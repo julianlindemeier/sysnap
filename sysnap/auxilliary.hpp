@@ -69,6 +69,11 @@ namespace sysnap {
 	std::string GetGroup(boost::filesystem::path _path);
 	//Furthermore the size of a directory cannot easily be determined:
 	unsigned long GetSize(boost::filesystem::path _path);
+
+	/* * * * * * * * *
+	 * Pretty Output *
+	 * * * * * * * * */
+	std::string ByteSuffix(float _num);
 }
 
 #endif

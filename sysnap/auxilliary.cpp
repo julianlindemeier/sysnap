@@ -288,7 +288,6 @@ namespace sysnap {
 
 		return std::string(gr->gr_name);
 	}
-
 	unsigned long GetSize(boost::filesystem::path _path) {
 		if(boost::filesystem::is_regular_file(_path)) {
 			return boost::filesystem::file_size(_path);
@@ -303,6 +302,41 @@ namespace sysnap {
     	}
 
 		return size_tmp;
+	}
+
+	/* * * * * * * * *
+	 * Pretty Output *
+	 * * * * * * * * */
+	std::string ByteSuffix(float _num) {
+		int suffix = 0;
+		while(_num > 1023.0f) {
+			_num /= 1024.0f;
+			suffix++;
+		}
+
+		std::string ret_string = std::to_string(_num);
+
+		switch(suffix) {
+			case 1:
+				ret_string += " K";
+				break;
+			case 2:
+				ret_string += " M";
+				break;
+			case 3:
+				ret_string += " G";
+				break;
+			case 4:
+				ret_string += " T";
+				break;
+			default:
+				ret_string += " ";
+				break;
+		}
+
+		ret_string += "Bytes";
+
+		return ret_string;
 	}
 }
 

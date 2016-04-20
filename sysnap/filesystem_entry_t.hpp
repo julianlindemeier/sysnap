@@ -23,7 +23,7 @@ namespace sysnap {
 
 	public:
 		FileSystemEntry_t();
-		~FileSystemEntry_t() {}
+		~FileSystemEntry_t();
 
 		/*---> SETTERS <---*/
 		void Name(std::string _name);
@@ -52,11 +52,11 @@ namespace sysnap {
 		unsigned long					Size();
 		UNIX_FILE_t						FileType();
 		std::vector<FileSystemEntry_t>	Content();
-		FileSystemEntry_t*				Find(std::string);
+		FileSystemEntry_t*				Find(std::string _name);
 		bool							Empty();
 
 		/*---> OPERATORS <---*/
-		FileSystemEntry_t operator[](int _index);
+		FileSystemEntry_t& operator[](int _index);
 		FileSystemEntry_t& operator[](std::string _name);
 	};
 }
