@@ -16,7 +16,7 @@ namespace sysnap {
 
 		void Scan(Path_t _path);
 		void Print(std::ostream &_out=std::cout);
-		void ExportAsXML();
+		void ExportAsXML(Path_t _output_path);
 
 	//TODO: change back to private!!!
 	public:

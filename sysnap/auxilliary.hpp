@@ -14,7 +14,8 @@ namespace sysnap {
 	/* * * * * * * * * * *
 	 * Parsing Arguments *
 	 * * * * * * * * * * */
-	std::vector< std::pair<std::string, std::string> > parse_args(std::vector<std::string> _args);
+	std::vector< std::pair<std::string, std::string> > ParseArguments(const char *argc[], int len_args_arr);
+	std::string	GetCWD();
 
 	/* * * * * * * *
 	 * Math Stuff  *

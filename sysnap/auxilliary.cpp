@@ -8,15 +8,22 @@ namespace sysnap {
 	/* * * * * * * * * * *
 	 * Parsing Arguments *
 	 * * * * * * * * * * */
-	std::vector< std::pair<std::string, std::string> > parse_args(std::vector<std::string> _args) {
+	std::vector< std::pair<std::string, std::string> > ParseArguments(const char *argv[], int len_args_arr) {
+		std::vector<std::string> args;
 		std::vector< std::pair<std::string, std::string> > args_table;
 		int counter = 0;
-		for(std::vector<std::string>::iterator iter = _args.begin();
-		iter != _args.end();
+
+		//Copy arguments into args-vector:
+		for(int i=1; i < len_args_arr; i++) {
+			args.push_back(argv[i]);
+		}
+
+		for(std::vector<std::string>::iterator iter = args.begin();
+		iter != args.end();
 		iter++, counter++) {
 			if(iter[0][0] == '-') {
 				//check if there are more elements within args than the current one.
-				if(counter+1 < _args.size()) {
+				if(counter+1 < args.size()) {
 					//make sure the next element does NOT begin with a hyphen.
 					if(iter[1][0] != '-') {
 						//-<key> <value>
@@ -51,7 +58,21 @@ namespace sysnap {
 
 		return args_table;
 	}
+	std::string GetCWD() {
+		std::string ret_string;
 
+		char* path_tmp = new char[FILENAME_MAX];
+
+		if(!getcwd(path_tmp, FILENAME_MAX)) {
+			std::cerr << "Error.\n";
+			exit(1);
+		}
+
+		ret_string = path_tmp;
+
+		delete[] path_tmp;
+		return ret_string;
+	}
 	/* * * * * * * *
 	 * Math Stuff  *
 	 * * * * * * * */

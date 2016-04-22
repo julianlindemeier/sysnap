@@ -5,6 +5,8 @@
 #include <boost/filesystem.hpp>
 #include <termcolor/termcolor.hpp>
 
+extern bool verbose;
+
 namespace sysnap {
 	FileSystem_t::FileSystem_t() {
 
@@ -17,18 +19,39 @@ namespace sysnap {
 	void FileSystem_t::Scan(Path_t _path) {
 		boost::filesystem::path	dir_path(_path.GetString());
 
+		if(!boost::filesystem::exists(dir_path)	|| !boost::filesystem::is_directory(dir_path)) {
+			std::cerr << termcolor::bold << termcolor::red << "[ERROR]: " << termcolor::reset;
+			std::cerr << termcolor::red << "Directory >" << dir_path.string() << "< does not exist!\n" << termcolor::reset;
+
+			exit(1);
+		}
+
 		//Here comes the boost stuff!
 		try {
+			if(verbose) {
+				std::cout << termcolor::bold << termcolor::cyan << "[INFO]: " << termcolor::reset;
+				std::cout << termcolor::cyan << "Scanning >" << dir_path.string() <<  "< ...\n" << termcolor::reset;
+			}
+
 			this->_Scan_(dir_path);
 
+			if(verbose) {
+				std::cout << termcolor::bold << termcolor::cyan << "[INFO]: " << termcolor::reset;
+				std::cout << termcolor::cyan << "... complete.\n" << termcolor::reset;
+			}
+
 		} catch(boost::filesystem::filesystem_error& _err) {
-			std::cerr << termcolor::blink << termcolor::bold << termcolor::red << "ERROR: " << termcolor::reset;
+			std::cerr << termcolor::bold << termcolor::red << "[ERROR]: " << termcolor::reset;
 			std::cerr << termcolor::red << _err.what() << std::endl << termcolor::reset;
 		}
 	}
 
 	void FileSystem_t::Print(std::ostream &_out) {
 		if(&_out != &std::cout) {
+			if(verbose) {
+				std::cout << termcolor::bold << termcolor::cyan << "[INFO]: " << termcolor::reset;
+				std::cout << termcolor::cyan << "Exporting as XML to file...\n" << termcolor::reset;
+			}
 			//If so, export file as XML, hence add xml-header
 			_out << "<?xml version=\"1.0\"?>\n\n";
 			_out << "<system>\n";
@@ -36,11 +59,32 @@ namespace sysnap {
 		this->_Print_(*this->system_m, _out);
 		if(&_out != &std::cout) {
 			_out << "</system>\n";
+
+			if(verbose) {
+				std::cout << termcolor::bold << termcolor::cyan << "[INFO]: " << termcolor::reset;
+				std::cout << termcolor::cyan << "...complete.\n" << termcolor::reset;
+			}
 		}
 	}
 
-	void FileSystem_t::ExportAsXML() {
-		//TODO: Finish FileSystem_t::ExportAsXML()-function.
+	void FileSystem_t::ExportAsXML(Path_t _output_path) {
+		std::ofstream output_file;
+		output_file.open(_output_path.GetString());
+
+		if(!output_file) {
+			std::cerr << termcolor::bold << termcolor::red << "[ERROR]: " << termcolor::reset;
+			std::cerr << termcolor::red << "Could not open/create file: " << _output_path.GetBoostPath().filename() << " in >"
+										 << _output_path.GetBoostPath().parent_path().string() << "<!\n" << termcolor::reset;
+			exit(1);
+		} else if(verbose) {
+			std::cout << termcolor::bold << termcolor::cyan << "[INFO]: " << termcolor::reset;
+			std::cout << termcolor::cyan << "Creating file: " << _output_path.GetBoostPath().filename() << " in >"
+										 << _output_path.GetBoostPath().parent_path().string() << "<\n" << termcolor::reset;
+		}
+
+		this->Print(output_file);
+
+		output_file.close();
 	}
 
 	void FileSystem_t::_Insert_(FileSystemEntry_t _entry) {
@@ -130,7 +174,7 @@ namespace sysnap {
 	void FileSystem_t::_Scan_(boost::filesystem::path _path) {
 		FileSystemEntry_t				newEntry;
 		boost::filesystem::file_status	stats = boost::filesystem::status(_path);
-		
+
 		newEntry.Name(_path.filename().string());
 		newEntry.Path(_path.parent_path().string());
 		newEntry.DateModified(GetLocalTime(boost::filesystem::last_write_time(_path)));

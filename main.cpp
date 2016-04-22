@@ -8,42 +8,29 @@
 #include <vector>
 #include "sysnap/sysnap.hpp"
 
-//#define DEBUG
+bool verbose = false;
+bool print = false;
+bool output = false;
 
 int main(int argc, char const *argv[]) {
-	sysnap::Path_t input_path;
-	bool print = false;
-	bool output = false;
+	//Default input path is the current working directory:
+	sysnap::Path_t input_path = sysnap::GetCWD();
 	sysnap::Path_t output_path;
-	std::vector<std::string> args;
 	std::vector< std::pair<std::string, std::string> > args_table;
 
-	//Copy arguments into args-vector:
-	for(int i=1; i < argc; i++) {
-		args.push_back(argv[i]);
-	}
-
 	//if no arguments are given, take the current directory
-	args_table = sysnap::parse_args(args);
+	args_table = sysnap::ParseArguments(argv, argc);
 
-	if(args_table.empty()) {
-		char* path_tmp = new char[FILENAME_MAX];
-
-		if(!getcwd(path_tmp, FILENAME_MAX)) {
-			std::cerr << "Error.\n";
-			return 1;
-		}
-
-		input_path = path_tmp;
-
-		delete[] path_tmp;
-	} else {
+	{
 		for(int i=0; i < args_table.size(); i++) {
 			if(args_table[i].first == "path" || args_table[i].first == "p" || args_table[i].first.empty()) {
 				input_path = args_table[i].second;
 			}
 			if(args_table[i].first == "print") {
 				print = true;
+			}
+			if(args_table[i].first == "verbose" || args_table[i].first == "v") {
+				verbose = true;
 			}
 			if(args_table[i].first == "output" || args_table[i].first == "o") {
 				output = true;
@@ -54,24 +41,19 @@ int main(int argc, char const *argv[]) {
 		}
 	}
 
-	std::cout << "Scanning " << input_path << "\n";
-
 	//TODO: Add XML-Writer
 	//TODO: Add XML-Reader
 	//TODO: Add Comparator
 
-	sysnap::FileSystem_t mySystem;
+	sysnap::FileSystem_t mySystem1;
 
-	mySystem.Scan(input_path);
+	mySystem1.Scan(input_path);
 	if(print) {
-		mySystem.Print();
+		mySystem1.Print();
 	}
-	
+
 	if(output) {
-		std::ofstream output_file;
-		output_file.open(output_path.GetString());
-		mySystem.Print(output_file);
-		output_file.close();
+		mySystem1.ExportAsXML(output_path);
 	}
 
 	sysnap::Path_t path1, path2;
