@@ -4,20 +4,17 @@
  */
 
 #include <iostream>
-#include <iomanip>
-#include <unistd.h>
-#include <termcolor/termcolor.hpp>
-#include <pugixml.hpp>
+#include <fstream>
 #include <vector>
-#include <boost/filesystem.hpp>
-
 #include "sysnap/sysnap.hpp"
 
 //#define DEBUG
 
-
 int main(int argc, char const *argv[]) {
-	sysnap::Path_t path;
+	sysnap::Path_t input_path;
+	bool print = false;
+	bool output = false;
+	sysnap::Path_t output_path;
 	std::vector<std::string> args;
 	std::vector< std::pair<std::string, std::string> > args_table;
 
@@ -37,20 +34,27 @@ int main(int argc, char const *argv[]) {
 			return 1;
 		}
 
-		path = path_tmp;
+		input_path = path_tmp;
 
 		delete[] path_tmp;
 	} else {
 		for(int i=0; i < args_table.size(); i++) {
 			if(args_table[i].first == "path" || args_table[i].first == "p" || args_table[i].first.empty()) {
-				path = args_table[i].second;
+				input_path = args_table[i].second;
+			}
+			if(args_table[i].first == "print") {
+				print = true;
+			}
+			if(args_table[i].first == "output" || args_table[i].first == "o") {
+				output = true;
+				output_path = args_table[i].second;
 			}
 
 			//TODO: Add further options here.
 		}
 	}
 
-	std::cout << "Scanning " << path << "\n";
+	std::cout << "Scanning " << input_path << "\n";
 
 	//TODO: Add XML-Writer
 	//TODO: Add XML-Reader
@@ -58,8 +62,17 @@ int main(int argc, char const *argv[]) {
 
 	sysnap::FileSystem_t mySystem;
 
-	mySystem.Scan(path);
-	mySystem.Print();
+	mySystem.Scan(input_path);
+	if(print) {
+		mySystem.Print();
+	}
+	
+	if(output) {
+		std::ofstream output_file;
+		output_file.open(output_path.GetString());
+		mySystem.Print(output_file);
+		output_file.close();
+	}
 
 	sysnap::Path_t path1, path2;
 

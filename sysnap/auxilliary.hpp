@@ -4,6 +4,8 @@
 #include <pwd.h>
 #include <grp.h>
 #include <sys/stat.h>
+#include <sys/types.h>
+#include <unistd.h>
 
 #ifndef SYSNAP_AUXILLIARY_HPP
 #define SYSNAP_AUXILLIARY_HPP
@@ -52,13 +54,12 @@ namespace sysnap {
 		REGULAR_FILE = 0,
 		DIRECTORY,
 		SYMLINK,
-		BLOCK_DEVICE,
-		CHARACTER_DEVICE,
+		BLOCK_CHAR_DEVICE,
 		FIFO,
 		SOCKET,
 		UNKNOWN
 	};
-	UNIX_FILE_t	BoostFileType2UNIX_FILE_t(boost::filesystem::file_type _boost_file_type);
+	UNIX_FILE_t	GetFileType(boost::filesystem::path _path);
 	std::string	GetFileTypeString(UNIX_FILE_t _file_type);
 
 	/* * * * * * * * * * * * *

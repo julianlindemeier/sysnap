@@ -206,8 +206,22 @@ namespace sysnap {
 	/* * * * * * * *
 	 * UNIX_FILE_t *
 	 * * * * * * * */
-	UNIX_FILE_t	BoostFileType2UNIX_FILE_t(boost::filesystem::file_type _boost_file_type) {
-		UNIX_FILE_t ret_file_type;
+ 	UNIX_FILE_t	GetFileType(boost::filesystem::path _path) {
+		UNIX_FILE_t 	ret_file_type;
+
+		if(boost::filesystem::is_directory(_path)) {
+			ret_file_type = DIRECTORY;
+		}
+		if(boost::filesystem::is_regular_file(_path)) {
+			ret_file_type = REGULAR_FILE;
+		}
+		if(boost::filesystem::is_symlink(_path)) {
+			ret_file_type = SYMLINK;
+		}
+		if(boost::filesystem::is_other(_path)) {
+			ret_file_type = UNKNOWN;
+		}
+/*
 		switch(_boost_file_type) {
 			case boost::filesystem::regular_file:
 				ret_file_type = REGULAR_FILE;
@@ -234,7 +248,7 @@ namespace sysnap {
 				ret_file_type = UNKNOWN;
 				break;
 		}
-
+*/
 		return ret_file_type;
 	}
 
@@ -251,11 +265,8 @@ namespace sysnap {
 			case SYMLINK:
 				ret_file_type_string = "Symlink";
 				break;
-			case BLOCK_DEVICE:
-				ret_file_type_string = "Block Device";
-				break;
-			case CHARACTER_DEVICE:
-				ret_file_type_string = "Character Device";
+			case BLOCK_CHAR_DEVICE:
+				ret_file_type_string = "Block/Character Device";
 				break;
 			case FIFO:
 				ret_file_type_string = "FIFO File";
@@ -284,24 +295,36 @@ namespace sysnap {
 	std::string GetGroup(boost::filesystem::path _path) {
 		struct ::stat 			info;
 		::stat(_path.string().c_str(), &info);
+
 		struct ::group  *gr = getgrgid(info.st_gid);
 
 		return std::string(gr->gr_name);
 	}
 	unsigned long GetSize(boost::filesystem::path _path) {
+		unsigned long ret_size = 0;
+
 		if(boost::filesystem::is_regular_file(_path)) {
-			return boost::filesystem::file_size(_path);
+			ret_size = boost::filesystem::file_size(_path);
+		}
+		if(boost::filesystem::is_symlink(_path)) {
+			ret_size = boost::filesystem::read_symlink(_path).size();
+		}
+		if( boost::filesystem::is_directory(_path)
+		&& !boost::filesystem::is_other(_path)) {
+    		for(boost::filesystem::recursive_directory_iterator rcrsv_iter(_path);
+        	rcrsv_iter != boost::filesystem::recursive_directory_iterator();
+        	++rcrsv_iter) {
+				if(boost::filesystem::is_symlink(rcrsv_iter->path())) {
+					ret_size += boost::filesystem::read_symlink(rcrsv_iter->path()).size();
+					continue;
+				}
+        		if(boost::filesystem::is_regular_file(rcrsv_iter->path())) {
+            		ret_size += boost::filesystem::file_size(*rcrsv_iter);
+				}
+    		}
 		}
 
-		unsigned long size_tmp=0;
-    	for(boost::filesystem::recursive_directory_iterator rcrsv_iter(_path);
-        rcrsv_iter != boost::filesystem::recursive_directory_iterator();
-        ++rcrsv_iter) {
-        	if(!boost::filesystem::is_directory(*rcrsv_iter))
-            	size_tmp += boost::filesystem::file_size(*rcrsv_iter);
-    	}
-
-		return size_tmp;
+		return ret_size;
 	}
 
 	/* * * * * * * * *
