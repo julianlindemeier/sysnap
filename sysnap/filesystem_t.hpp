@@ -1,29 +1,12 @@
 #include "filesystem_entry_t.hpp"
 #include <ostream>
 #include "path_t.hpp"
+#include "comparison_report_t.hpp"
 
 #ifndef SYSNAP_FILESYSTEM_HPP
 #define SYSNAP_FILESYSTEM_HPP
 
 namespace sysnap {
-	enum COMPARISON_TYPE_t {
-		NAME_CHANGE = 0,
-		FILE_MODIFIED,
-		PERMISSIONS_CHANGED,
-		OWNER_CHANGED,
-		GROUP_CHANGED,
-		SIZE_CHANGED,
-		FILE_TYPE_CHANGED,
-		ADDED,
-		REMOVED
-	};
-
-	struct ComparisonResult {
-		FileSystemEntry_t*				previous;
-		FileSystemEntry_t*				current;
-		std::vector<COMPARISON_TYPE_t>	type;
-	};
-
 	class FileSystem_t {
 	public:
 		Timestamp_t						snap_created_m;
@@ -38,7 +21,7 @@ namespace sysnap {
 		void ExportAsXML(Path_t _output_path);
 
 		static
-		std::vector<ComparisonResult> Compare(FileSystem_t& _first, FileSystem_t& _second);
+		ComparisonReport_t Compare(FileSystem_t& _first, FileSystem_t& _second);
 
 	private:
 		void _Insert_(FileSystemEntry_t* _entry);

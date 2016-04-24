@@ -4,13 +4,16 @@
  */
 
 #include <iostream>
+#include <iomanip>
 #include <fstream>
 #include <vector>
+#include <termcolor/termcolor.hpp>
 #include "sysnap/sysnap.hpp"
 
 bool verbose = false;
 bool print = false;
 bool output = false;
+bool compare = false;
 
 int main(int argc, char const *argv[]) {
 	//Default input path is the current working directory:
@@ -35,6 +38,9 @@ int main(int argc, char const *argv[]) {
 			if(args_table[i].first == "output" || args_table[i].first == "o") {
 				output = true;
 				output_path = args_table[i].second;
+			}
+			if(args_table[i].first == "compare" || args_table[i].first == "c") {
+				compare = true;
 			}
 
 			//TODO: Add further options here.
@@ -61,49 +67,18 @@ int main(int argc, char const *argv[]) {
 		mySystem1.ExportAsXML(output_path);
 	}
 
-	std::vector<sysnap::ComparisonResult> comparison_report;
-	comparison_report =  sysnap::FileSystem_t::Compare(mySystem1, mySystem2);
+	if(compare) {
+		sysnap::ComparisonReport_t comparison_report;
+		comparison_report =  sysnap::FileSystem_t::Compare(mySystem1, mySystem2);
 
-	for(std::vector<sysnap::ComparisonResult>::iterator comp_iter = comparison_report.begin();
-	comp_iter != comparison_report.end();
-	comp_iter++) {
-		for(std::vector<sysnap::COMPARISON_TYPE_t>::iterator comp_type_iter = comp_iter->type.begin();
-		comp_type_iter != comp_iter->type.end();
-		comp_type_iter++) {
-			switch(*comp_type_iter) {
-				case sysnap::NAME_CHANGE:
-					std::cout << "Name of " << comp_iter->previous->Name() << " changed to " << comp_iter->current->Name() << "\n";
-					break;
-				case sysnap::FILE_MODIFIED:
-					std::cout << "Contents of " << comp_iter->current->Name() << " were modified on " << sysnap::GetTimeString(comp_iter->current->DateModified()) << "\n";
-					break;
-				case sysnap::PERMISSIONS_CHANGED:
-					std::cout << "Permissions of " << comp_iter->previous->Name() << " changed from " << sysnap::GetPermissionsString(comp_iter->previous->Permissions())
-					 																			<< " to " << sysnap::GetPermissionsString(comp_iter->current->Permissions())  << "\n";
-					break;
-				case sysnap::OWNER_CHANGED:
-					std::cout << "Owner of " << comp_iter->previous->Name() << " changed from " << comp_iter->previous->Owner()
-																					  << " to " << comp_iter->current->Owner()  << "\n";
-					break;
-				case sysnap::GROUP_CHANGED:
-					std::cout << "Group of " << comp_iter->previous->Name() << " changed from " << comp_iter->previous->Group()
-																					  << " to " << comp_iter->current->Group()  << "\n";
-					break;
-				case sysnap::SIZE_CHANGED:
-					std::cout << "Size of " << comp_iter->previous->Name() << " changed from " << sysnap::ByteSuffix(comp_iter->previous->Size())
-																					 << " to " << sysnap::ByteSuffix(comp_iter->current->Size())  << "\n";
-					break;
-				case sysnap::FILE_TYPE_CHANGED:
-					std::cout << "Type of " << comp_iter->previous->Name() << " changed from " << sysnap::GetFileTypeString(comp_iter->previous->FileType())
-																					 << " to " << sysnap::GetFileTypeString(comp_iter->current->FileType())  << "\n";
-					break;
-
-				default:
-					break;
-			}
+		if(verbose) {
+				std::cout << termcolor::bold << termcolor::cyan << "[INFO]: " << termcolor::reset;
+				std::cout << "Printing comparison report: \n" << termcolor::reset;
 		}
-		std::cout << "\n";
+		comparison_report.Print();
 	}
+
+
 
 	return 0;
 }

@@ -2,6 +2,7 @@
 #include "auxilliary.hpp"
 #include "filesystem_entry_t.hpp"
 #include "path_t.hpp"
+#include "comparison_report_t.hpp"
 #include <boost/filesystem.hpp>
 #include <termcolor/termcolor.hpp>
 
@@ -27,7 +28,7 @@ namespace sysnap {
 
 		if(!boost::filesystem::exists(dir_path)	|| !boost::filesystem::is_directory(dir_path)) {
 			std::cerr << termcolor::bold << termcolor::red << "[ERROR]: " << termcolor::reset;
-			std::cerr << termcolor::red << "Directory >" << dir_path.string() << "< does not exist!\n" << termcolor::reset;
+			std::cerr << "Directory >" << dir_path.string() << "< does not exist!\n" << termcolor::reset;
 
 			exit(1);
 		}
@@ -36,7 +37,7 @@ namespace sysnap {
 		try {
 			if(verbose) {
 				std::cout << termcolor::bold << termcolor::cyan << "[INFO]: " << termcolor::reset;
-				std::cout << termcolor::cyan << "Scanning >" << dir_path.string() <<  "< ...\n" << termcolor::reset;
+				std::cout << "Scanning >" << dir_path.string() <<  "< ...\n" << termcolor::reset;
 			}
 
 			this->snap_created_m = GetLocalTime();
@@ -44,12 +45,12 @@ namespace sysnap {
 
 			if(verbose) {
 				std::cout << termcolor::bold << termcolor::cyan << "[INFO]: " << termcolor::reset;
-				std::cout << termcolor::cyan << "... complete.\n" << termcolor::reset;
+				std::cout << "... complete.\n" << termcolor::reset;
 			}
 
 		} catch(boost::filesystem::filesystem_error& _err) {
 			std::cerr << termcolor::bold << termcolor::red << "[ERROR]: " << termcolor::reset;
-			std::cerr << termcolor::red << _err.what() << std::endl << termcolor::reset;
+			std::cerr << _err.what() << std::endl << termcolor::reset;
 		}
 	}
 
@@ -57,19 +58,21 @@ namespace sysnap {
 		if(&_out != &std::cout) {
 			if(verbose) {
 				std::cout << termcolor::bold << termcolor::cyan << "[INFO]: " << termcolor::reset;
-				std::cout << termcolor::cyan << "Exporting as XML to file...\n" << termcolor::reset;
+				std::cout << "Exporting as XML to file...\n" << termcolor::reset;
 			}
 			//If so, export file as XML, hence add xml-header
 			_out << "<?xml version=\"1.0\"?>\n\n";
 			_out << "<system>\n";
 		}
+
 		this->_Print_(this->system_m[0], _out);
+		
 		if(&_out != &std::cout) {
 			_out << "</system>\n";
 
 			if(verbose) {
 				std::cout << termcolor::bold << termcolor::cyan << "[INFO]: " << termcolor::reset;
-				std::cout << termcolor::cyan << "...complete.\n" << termcolor::reset;
+				std::cout << "...complete.\n" << termcolor::reset;
 			}
 		}
 	}
@@ -80,12 +83,12 @@ namespace sysnap {
 
 		if(!output_file.is_open()) {
 			std::cerr << termcolor::bold << termcolor::red << "[ERROR]: " << termcolor::reset;
-			std::cerr << termcolor::red << "Could not open/create file: " << _output_path.GetBoostPath().filename() << " in >"
+			std::cerr << "Could not open/create file: " << _output_path.GetBoostPath().filename() << " in >"
 										 << _output_path.GetBoostPath().parent_path().string() << "<!\n" << termcolor::reset;
 			exit(1);
 		} else if(verbose) {
 			std::cout << termcolor::bold << termcolor::cyan << "[INFO]: " << termcolor::reset;
-			std::cout << termcolor::cyan << "Creating file: " << _output_path.GetBoostPath().filename() << " in >"
+			std::cout << "Creating file: " << _output_path.GetBoostPath().filename() << " in >"
 										 << _output_path.GetBoostPath().parent_path().string() << "<\n" << termcolor::reset;
 		}
 
@@ -94,16 +97,16 @@ namespace sysnap {
 		output_file.close();
 	}
 
-	std::vector<ComparisonResult> FileSystem_t::Compare(FileSystem_t& _first, FileSystem_t& _second) {
+	ComparisonReport_t FileSystem_t::Compare(FileSystem_t& _first, FileSystem_t& _second) {
 		if(verbose) {
 			std::cout << termcolor::bold << termcolor::cyan << "[INFO]: " << termcolor::reset;
-			std::cout << termcolor::cyan << "Comparing Snapshot of " << _first.system_m[0]->Name() << " in "<< _first.system_m[0]->Path() << " from " << GetTimeString(_first.snap_created_m) << "\n"
-								 << "               to Snapshot of " << _second.system_m[0]->Name() << " in "<< _second.system_m[0]->Path() << " from " << GetTimeString(_second.snap_created_m) << "\n"<< termcolor::reset;
+			std::cout << "Comparing Snapshot of " << _first.system_m[0]->Name() << " in "<< _first.system_m[0]->Path() << " from " << GetTimeString(_first.snap_created_m) << "\n"
+			  << "               to Snapshot of " << _second.system_m[0]->Name() << " in "<< _second.system_m[0]->Path() << " from " << GetTimeString(_second.snap_created_m) << "\n"<< termcolor::reset;
 		}
 
-		std::vector<ComparisonResult> comparison_report;
+		ComparisonReport_t comparison_report;
+		ComparisonResult_t new_comparison;
 
-		ComparisonResult new_comparison;
 		for(std::vector<FileSystemEntry_t*>::iterator frst_cntnt_iter = _first.system_m.begin();
 		frst_cntnt_iter != _first.system_m.end();
 		frst_cntnt_iter++) {
@@ -111,44 +114,50 @@ namespace sysnap {
 			scnd_cntnt_iter != _second.system_m.end();
 			scnd_cntnt_iter++) {
 				if((*frst_cntnt_iter)->iNode()		== (*scnd_cntnt_iter)->iNode()) {
-					//std::cout << "\tComparing... \"" << (*frst_cntnt_iter)->Name() << "\" to \"" << (*scnd_cntnt_iter)->Name() << "\"\n";
-
 					new_comparison.previous = *frst_cntnt_iter;
 					new_comparison.current  = *scnd_cntnt_iter;
-					bool the_times_they_are_a_changing = false;
+					bool change_occurred = false;
 
 					if((*frst_cntnt_iter)->Name()			!= (*scnd_cntnt_iter)->Name()) {
 						new_comparison.type.push_back(NAME_CHANGE);
-						the_times_they_are_a_changing = true;
+						change_occurred = true;
 					}
 					if((*frst_cntnt_iter)->DateModified()	!= (*scnd_cntnt_iter)->DateModified()) {
 						new_comparison.type.push_back(FILE_MODIFIED);
-						the_times_they_are_a_changing = true;
+						change_occurred = true;
 					}
 					if((*frst_cntnt_iter)->Permissions()	!= (*scnd_cntnt_iter)->Permissions()) {
 						new_comparison.type.push_back(PERMISSIONS_CHANGED);
-						the_times_they_are_a_changing = true;
+						change_occurred = true;
 					}
 					if((*frst_cntnt_iter)->Owner()			!= (*scnd_cntnt_iter)->Owner()) {
 						new_comparison.type.push_back(OWNER_CHANGED);
-						the_times_they_are_a_changing = true;
+						change_occurred = true;
 					}
 					if((*frst_cntnt_iter)->Group()			!= (*scnd_cntnt_iter)->Group()) {
 						new_comparison.type.push_back(GROUP_CHANGED);
-						the_times_they_are_a_changing = true;
+						change_occurred = true;
 					}
 					if((*frst_cntnt_iter)->Size()			!= (*scnd_cntnt_iter)->Size()) {
 						new_comparison.type.push_back(SIZE_CHANGED);
-						the_times_they_are_a_changing = true;
+						change_occurred = true;
 					}
 					if((*frst_cntnt_iter)->FileType()		!= (*scnd_cntnt_iter)->FileType()) {
+						//If the file Type changed to symlink, it's most likely not the same file, though the iNodes of both are the same,
+						//we need to filter these cases:
+						if((*frst_cntnt_iter)->FileType() == sysnap::SYMLINK || (*scnd_cntnt_iter)->FileType() == sysnap::SYMLINK) {
+							new_comparison.type.clear();
+							continue;
+						}
+
 						new_comparison.type.push_back(FILE_TYPE_CHANGED);
-						the_times_they_are_a_changing = true;
+						change_occurred = true;
 					}
 
 
-					if(the_times_they_are_a_changing) {
-						comparison_report.push_back(new_comparison);
+					if(change_occurred) {
+						comparison_report.Insert(new_comparison);
+						new_comparison.type.clear();
 					}
 				}
 			}
@@ -179,10 +188,7 @@ namespace sysnap {
 		}
 
 		//insert the entry into the desired directory.
-		std::cout << "Inserting " << _entry->Name() << " (" << _entry << ") into " << dir_iter->Name() << "(" << dir_iter << ")\n";
 		dir_iter->InsertContent(_entry);
-
-		//std::cout << "Inserting " << &_entry << "(" << _entry.Name() << ") into " << dir_iter->Name() << "\n";
 		this->system_m.push_back(_entry);
 
 		return;

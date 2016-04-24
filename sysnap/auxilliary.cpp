@@ -80,7 +80,7 @@ namespace sysnap {
 		int oct = 0, digit = 0;
 
 		while(_dec > 0) {
-			oct += (_dec % 8) * pow(8, digit++);
+			oct += (_dec % 8) * pow(10, digit++);
 
 			_dec /= 8;
 		}
@@ -443,7 +443,7 @@ namespace sysnap {
 	unsigned long GetiNode(boost::filesystem::path _path) {
 		struct ::stat info;
 		::stat(_path.string().c_str(), &info);
-		
+
 		return info.st_ino;
 	}
 

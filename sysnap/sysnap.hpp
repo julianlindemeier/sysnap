@@ -5,5 +5,6 @@
 #include "path_t.hpp"
 #include "filesystem_entry_t.hpp"
 #include "filesystem_t.hpp"
+#include "comparison_report_t.hpp"
 
 #endif
