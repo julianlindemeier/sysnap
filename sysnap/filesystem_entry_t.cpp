@@ -35,6 +35,9 @@ namespace sysnap {
 	}
 
 	/*---> SETTERS <---*/
+	void FileSystemEntry_t::iNode(unsigned long _iNode) {
+		this->iNode_m = _iNode;
+	}
 	void FileSystemEntry_t::Name(std::string _name) {
 		this->name_m = _name;
 	}
@@ -93,11 +96,15 @@ namespace sysnap {
 		this->file_type_m = _file_type;
 	}
 
-	void FileSystemEntry_t::InsertContent(FileSystemEntry_t _fs_entry) {
+	void FileSystemEntry_t::InsertContent(FileSystemEntry_t* _fs_entry) {
 		this->content_m.push_back(_fs_entry);
 	}
 
 	/*---> GETTERS <---*/
+	unsigned long 					FileSystemEntry_t::iNode() {
+			return this->iNode_m;
+	}
+
 	std::string						FileSystemEntry_t::Name() {
 		return this->name_m;
 	}
@@ -130,16 +137,16 @@ namespace sysnap {
 		return this->file_type_m;
 	}
 
-	std::vector<FileSystemEntry_t>	FileSystemEntry_t::Content() {
+	std::vector<FileSystemEntry_t*>	FileSystemEntry_t::Content() {
 		return this->content_m;
 	}
 
 	FileSystemEntry_t*				FileSystemEntry_t::Find(std::string _name) {
-		for(std::vector<FileSystemEntry_t>::iterator iter = this->content_m.begin();
+		for(std::vector<FileSystemEntry_t*>::iterator iter = this->content_m.begin();
 		iter != this->content_m.end();
 		iter++) {
-			if(iter->Name() == _name) {
-				return &(*iter);
+			if((*iter)->Name() == _name) {
+				return *iter;
 			}
 		}
 
@@ -152,7 +159,7 @@ namespace sysnap {
 
 	/*---> OPERATORS <---*/
 	FileSystemEntry_t& 				FileSystemEntry_t::operator[](int _index) {
-		return this->content_m[_index];
+		return *this->content_m[_index];
 	}
 
 	FileSystemEntry_t&				FileSystemEntry_t::operator[](std::string _name) {

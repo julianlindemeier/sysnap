@@ -11,6 +11,7 @@
 namespace sysnap {
 	class FileSystemEntry_t {
 	private:
+		unsigned long					iNode_m;
 		std::string 					name_m;
 		Path_t							path_m;
 		Timestamp_t						date_modified_m;
@@ -19,13 +20,14 @@ namespace sysnap {
 		std::string						group_m;
 		unsigned long					size_m;
 		UNIX_FILE_t						file_type_m;
-		std::vector<FileSystemEntry_t>	content_m;
+		std::vector<FileSystemEntry_t*>	content_m;
 
 	public:
 		FileSystemEntry_t();
 		~FileSystemEntry_t();
 
 		/*---> SETTERS <---*/
+		void iNode(unsigned long _iNode);
 		void Name(std::string _name);
 		void Path(std::string _path);
 		void Path(Path_t _path);
@@ -40,9 +42,10 @@ namespace sysnap {
 		void Group(std::string _group);
 		void Size(unsigned long _size);
 		void FileType(UNIX_FILE_t _file_type);
-		void InsertContent(FileSystemEntry_t _fs_entry);
+		void InsertContent(FileSystemEntry_t* _fs_entry);
 
 		/*---> GETTERS <---*/
+		unsigned long					iNode();
 		std::string						Name();
 		Path_t							Path();
 		Timestamp_t						DateModified();
@@ -51,13 +54,18 @@ namespace sysnap {
 		std::string						Group();
 		unsigned long					Size();
 		UNIX_FILE_t						FileType();
-		std::vector<FileSystemEntry_t>	Content();
+		std::vector<FileSystemEntry_t*>	Content();
 		FileSystemEntry_t*				Find(std::string _name);
 		bool							Empty();
 
 		/*---> OPERATORS <---*/
 		FileSystemEntry_t& operator[](int _index);
 		FileSystemEntry_t& operator[](std::string _name);
+
+	//TODO: Change to private:
+	public:
+		bool operator<(FileSystemEntry_t& _fs) {return (this->iNode_m < _fs.iNode_m);}
+		bool operator>(FileSystemEntry_t& _fs) {return (this->iNode_m > _fs.iNode_m);}
 	};
 }
 

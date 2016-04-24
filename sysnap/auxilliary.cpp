@@ -91,6 +91,80 @@ namespace sysnap {
 	/* * * * * * * *
 	 * Timestamp_t *
 	 * * * * * * * */
+	bool Timestamp_t::operator==(const Timestamp_t& _time) {
+		if(this->day	== _time.day
+		&& this->month	== _time.month
+		&& this->year	== _time.year
+		&& this->hour 	== _time.hour
+		&& this->minute == _time.minute
+		&& this->second	== _time.second) {
+			return true;
+		}
+		return false;
+	}
+	bool Timestamp_t::operator!=(const Timestamp_t& _time) {
+		if(this->day	!= _time.day
+		|| this->month	!= _time.month
+		|| this->year	!= _time.year
+		|| this->hour 	!= _time.hour
+		|| this->minute != _time.minute
+		|| this->second	!= _time.second) {
+			return true;
+		}
+		return false;
+	}
+	bool Timestamp_t::operator<(const Timestamp_t& _time) {
+		if(this->year < _time.year) {
+			return true;
+		} else {
+			if(this->month < _time.month) {
+				return true;
+			} else {
+				if(this->day < _time.day) {
+					return true;
+				} else {
+					if(this->hour < _time.hour) {
+						return true;
+					} else {
+						if(this->minute < _time.minute) {
+							return true;
+						} else {
+							if(this->second < _time.second) {
+								return true;
+							}
+						}
+					}
+				}
+			}
+		}
+		return false;
+	}
+	bool Timestamp_t::operator>(const Timestamp_t& _time) {
+		if(this->year > _time.year) {
+			return true;
+		} else {
+			if(this->month > _time.month) {
+				return true;
+			} else {
+				if(this->day > _time.day) {
+					return true;
+				} else {
+					if(this->hour > _time.hour) {
+						return true;
+					} else {
+						if(this->minute > _time.minute) {
+							return true;
+						} else {
+							if(this->second > _time.second) {
+								return true;
+							}
+						}
+					}
+				}
+			}
+		}
+		return false;
+	}
 	Timestamp_t GetLocalTime(std::time_t _time) {
 		if(_time == 0) {
 			_time = std::time(NULL);
@@ -136,6 +210,24 @@ namespace sysnap {
 
 
 		return ret_perm_flags;
+	}
+	bool PermissionsFlag_t::operator==(const PermissionsFlag_t& _perms) {
+		if(this->owner	== _perms.owner
+		&& this->group	== _perms.group
+		&& this->others	== _perms.others) {
+			return true;
+		}
+
+		return false;
+	}
+	bool PermissionsFlag_t::operator!=(const PermissionsFlag_t& _perms) {
+		if(this->owner	!= _perms.owner
+		|| this->group	!= _perms.group
+		|| this->others	!= _perms.others) {
+			return true;
+		}
+
+		return false;
 	}
 	std::string			GetPermissionsString(PermissionsFlag_t _perms_flag) {
 		std::string ret_perms_string;
@@ -346,6 +438,13 @@ namespace sysnap {
 		}
 
 		return ret_size;
+	}
+
+	unsigned long GetiNode(boost::filesystem::path _path) {
+		struct ::stat info;
+		::stat(_path.string().c_str(), &info);
+		
+		return info.st_ino;
 	}
 
 	/* * * * * * * * *

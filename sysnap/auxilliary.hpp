@@ -33,7 +33,13 @@ namespace sysnap {
 		int		minute;
 		int		second;
 		char*	zone;
+
+		bool operator==(const Timestamp_t& _time);
+		bool operator!=(const Timestamp_t& _time);
+		bool operator< (const Timestamp_t& _time);
+		bool operator> (const Timestamp_t& _time);
 	};
+	unsigned long GetTime();
 	Timestamp_t GetLocalTime(std::time_t _time=0);
 	std::string	GetTimeString(Timestamp_t _local_time);
 
@@ -44,6 +50,11 @@ namespace sysnap {
 		int owner;
 		int group;
 		int others;
+
+		bool operator==(const PermissionsFlag_t& _perms);
+		bool operator!=(const PermissionsFlag_t& _perms);
+		bool operator< (const PermissionsFlag_t& _perms);
+		bool operator> (const PermissionsFlag_t& _perms);
 	};
 	PermissionsFlag_t	GetPermissionsFlag(int _perms_flag);
 	std::string			GetPermissionsString(PermissionsFlag_t _perms_flag);
@@ -71,6 +82,8 @@ namespace sysnap {
 	std::string GetGroup(boost::filesystem::path _path);
 	//Furthermore the size of a directory cannot easily be determined:
 	unsigned long GetSize(boost::filesystem::path _path);
+	//Most importantly, to have a unique identifier for every directory/file/... get the iNode Number!
+	unsigned long GetiNode(boost::filesystem::path _path);
 
 	/* * * * * * * * *
 	 * Pretty Output *
