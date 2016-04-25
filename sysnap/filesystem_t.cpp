@@ -66,7 +66,7 @@ namespace sysnap {
 		}
 
 		this->_Print_(this->system_m[0], _out);
-		
+
 		if(&_out != &std::cout) {
 			_out << "</system>\n";
 
@@ -110,6 +110,8 @@ namespace sysnap {
 		for(std::vector<FileSystemEntry_t*>::iterator frst_cntnt_iter = _first.system_m.begin();
 		frst_cntnt_iter != _first.system_m.end();
 		frst_cntnt_iter++) {
+			bool file_found = false;
+
 			for(std::vector<FileSystemEntry_t*>::iterator scnd_cntnt_iter = _second.system_m.begin();
 			scnd_cntnt_iter != _second.system_m.end();
 			scnd_cntnt_iter++) {
@@ -117,6 +119,8 @@ namespace sysnap {
 					new_comparison.previous = *frst_cntnt_iter;
 					new_comparison.current  = *scnd_cntnt_iter;
 					bool change_occurred = false;
+
+					file_found = true;
 
 					if((*frst_cntnt_iter)->Name()			!= (*scnd_cntnt_iter)->Name()) {
 						new_comparison.type.push_back(NAME_CHANGE);
@@ -160,6 +164,16 @@ namespace sysnap {
 						new_comparison.type.clear();
 					}
 				}
+			}
+
+			//File could not be found in system two:
+			if(!file_found) {
+				new_comparison.previous = *frst_cntnt_iter;
+				new_comparison.current  = NULL;
+
+				new_comparison.type.push_back(REMOVED);
+
+				comparison_report.Insert(new_comparison);
 			}
 		}
 

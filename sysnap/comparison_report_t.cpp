@@ -20,6 +20,11 @@ namespace sysnap {
 	}
 
 	void ComparisonReport_t::Print() {
+		if(verbose) {
+				std::cout << termcolor::bold << termcolor::cyan << "[INFO]: " << termcolor::reset;
+				std::cout << "Printing comparison report: \n" << termcolor::reset;
+		}
+
 		if(this->comparison_report_m.empty()) {
 			std::cout << "Nothing changed. \n";
 		}
@@ -39,31 +44,34 @@ namespace sysnap {
 			comp_type_iter++) {
 				switch(*comp_type_iter) {
 					case sysnap::NAME_CHANGE:
-						std::cout << level_indent << "- Name:        " << std::setw(20) << comp_iter->previous->Name()
+						std::cout << level_indent << "- Name:        "  << comp_iter->previous->Name()
 											 << " -> " << std::setw(20) << comp_iter->current->Name() << "\n";
 						break;
 					case sysnap::FILE_MODIFIED:
-						std::cout << level_indent << "- Contents:    " << std::setw(30) << sysnap::GetTimeString(comp_iter->current->DateModified()) << "\n";
+						std::cout << level_indent << "- Contents:    " << sysnap::GetTimeString(comp_iter->current->DateModified()) << "\n";
 						break;
 					case sysnap::PERMISSIONS_CHANGED:
-						std::cout << level_indent << "- Permissions: " << std::setw(20) << sysnap::GetPermissionsString(comp_iter->previous->Permissions())
+						std::cout << level_indent << "- Permissions: " << sysnap::GetPermissionsString(comp_iter->previous->Permissions())
 						 					 << " -> " << std::setw(20) << sysnap::GetPermissionsString(comp_iter->current->Permissions())  << "\n";
 						break;
 					case sysnap::OWNER_CHANGED:
-						std::cout << level_indent << "- Owner:       " << std::setw(20) << comp_iter->previous->Owner()
+						std::cout << level_indent << "- Owner:       " << comp_iter->previous->Owner()
 											 << " -> " << std::setw(20) << comp_iter->current->Owner()  << "\n";
 						break;
 					case sysnap::GROUP_CHANGED:
-						std::cout << level_indent << "- Group:       " << std::setw(20) << comp_iter->previous->Group()
+						std::cout << level_indent << "- Group:       " << comp_iter->previous->Group()
 											 << " -> " << std::setw(20) << comp_iter->current->Group()  << "\n";
 						break;
 					case sysnap::SIZE_CHANGED:
-						std::cout << level_indent << "- Size:        " << std::setw(20) << sysnap::ByteSuffix(comp_iter->previous->Size())
+						std::cout << level_indent << "- Size:        " << sysnap::ByteSuffix(comp_iter->previous->Size())
 											 << " -> " << std::setw(20) << sysnap::ByteSuffix(comp_iter->current->Size())  << "\n";
 						break;
 					case sysnap::FILE_TYPE_CHANGED:
-						std::cout << level_indent << "- Type:        " << std::setw(20) << sysnap::GetFileTypeString(comp_iter->previous->FileType())
+						std::cout << level_indent << "- Type:        " << sysnap::GetFileTypeString(comp_iter->previous->FileType())
 											 << " -> " << std::setw(20) << sysnap::GetFileTypeString(comp_iter->current->FileType())  << "\n";
+						break;
+					case sysnap::REMOVED:
+						std::cout << level_indent << "- File removed\n";
 						break;
 
 					default:

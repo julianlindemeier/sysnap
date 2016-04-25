@@ -49,7 +49,6 @@ int main(int argc, char const *argv[]) {
 
 	//TODO: Add XML-Writer
 	//TODO: Add XML-Reader
-	//TODO: Add Comparator
 
 	sysnap::FileSystem_t mySystem1;
 	sysnap::FileSystem_t mySystem2;
@@ -60,7 +59,6 @@ int main(int argc, char const *argv[]) {
 
 	if(print) {
 		mySystem1.Print();
-		mySystem2.Print();
 	}
 
 	if(output) {
@@ -70,11 +68,6 @@ int main(int argc, char const *argv[]) {
 	if(compare) {
 		sysnap::ComparisonReport_t comparison_report;
 		comparison_report =  sysnap::FileSystem_t::Compare(mySystem1, mySystem2);
-
-		if(verbose) {
-				std::cout << termcolor::bold << termcolor::cyan << "[INFO]: " << termcolor::reset;
-				std::cout << "Printing comparison report: \n" << termcolor::reset;
-		}
 		comparison_report.Print();
 	}
 
